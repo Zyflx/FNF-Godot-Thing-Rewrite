@@ -1,0 +1,47 @@
+[gd_scene load_steps=7 format=3 uid="uid://1wtilsk0yir"]
+
+[ext_resource type="Texture2D" uid="uid://c8fgj3yl17dxk" path="res://assets/images/note_assets/blue0000.png" id="1_m7ybq"]
+[ext_resource type="Script" path="res://game/objects/note/Note.gd" id="1_s47kl"]
+[ext_resource type="Texture2D" uid="uid://bbn1yryoirbu2" path="res://assets/images/note_assets/green0000.png" id="2_wy7pq"]
+[ext_resource type="Texture2D" uid="uid://dwi1cq74fgy6n" path="res://assets/images/note_assets/purple0000.png" id="3_30bf4"]
+[ext_resource type="Texture2D" uid="uid://dsw4bjrxhmrgb" path="res://assets/images/note_assets/red0000.png" id="4_61eem"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_poxdw"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_m7ybq")
+}],
+"loop": false,
+"name": &"blue",
+"speed": 0.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_wy7pq")
+}],
+"loop": false,
+"name": &"green",
+"speed": 0.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("3_30bf4")
+}],
+"loop": false,
+"name": &"purple",
+"speed": 0.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("4_61eem")
+}],
+"loop": false,
+"name": &"red",
+"speed": 0.0
+}]
+
+[node name="Note" type="AnimatedSprite2D"]
+sprite_frames = SubResource("SpriteFrames_poxdw")
+animation = &"red"
+script = ExtResource("1_s47kl")

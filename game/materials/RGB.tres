@@ -1,0 +1,13 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=3 uid="uid://cwoy80iaku2h4"]
+
+[ext_resource type="Shader" path="res://game/materials/RGB.gdshader" id="1_wcp62"]
+
+[resource]
+shader = ExtResource("1_wcp62")
+shader_parameter/def_r = Color(1, 0, 0, 1)
+shader_parameter/def_g = Color(0, 1, 0, 1)
+shader_parameter/def_b = Color(0, 0, 1, 1)
+shader_parameter/r = Color(0, 0, 0, 0)
+shader_parameter/g = Color(0, 0, 0, 0)
+shader_parameter/b = Color(0, 0, 0, 0)
+shader_parameter/enabled = false
