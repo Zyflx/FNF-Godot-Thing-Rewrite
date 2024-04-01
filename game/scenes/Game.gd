@@ -23,11 +23,11 @@ func _ready() -> void:
 	Chart.chart = Chart.load_chart('partner')
 	song_data = Chart.chart
 	
-	Conductor.bpm = song_data.bpm
-	Conductor.init_music(song_data.song, song_data.needs_voices)
+	Conductor.bpm = song_data.info.bpm
+	Conductor.init_music(song_data.info.song, song_data.info.needs_voices)
 	Conductor.play_music()
 	
-	song_speed = song_data.speed
+	song_speed = song_data.info.speed
 	note_data = song_data.notes
 	
 	cam_hud.layer = -1
@@ -78,28 +78,28 @@ func _unhandled_key_input(event) -> void:
 	
 	var hittable_notes:Array[Note] = notes.filter(func(n:Note):
 		return n.must_hit and n.can_hit and n.lane == key and not n.was_good_hit and not n.can_cause_miss
-	)
-	
+	)	
+			
 	hittable_notes.sort_custom(func(a:Note, b:Note): return a.time < b.time)
-	
+
 	if (event.is_pressed() and keys_arr[key]):
 		if (hittable_notes.size() > 0):
 			var note:Note = hittable_notes[0]
-			
+					
 			if (hittable_notes.size() > 1):
 				var behind_note:Note = hittable_notes[1]
-				
+						
 				if (absf(behind_note.time - note.time) < 2.0):
 					destroy_note(behind_note)
 				elif (behind_note.lane == note.lane and behind_note.time < note.time):
 					note = behind_note
-					
+							
 			player_hit(note)
 		else:
 			plr_strums[key].play_anim(plr_strums[key].dir_to_name() + ' press')
 	else:
 		plr_strums[key].play_anim('static')
-	
+		
 func get_key_index(key:int) -> int:
 	for i in keys_arr.size():
 		if (key == keys_arr[i]):
