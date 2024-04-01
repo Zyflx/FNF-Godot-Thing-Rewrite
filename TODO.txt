@@ -1,0 +1,4 @@
+Update input system to use actions instead of preset keys (to elaborate to change the binds right now you have to edit the keys_arr var)
+Sustains
+Add beat and step shit to conductor
+and some more stuff im too lazy to add here
