@@ -6,6 +6,7 @@ static var swag_width:float = 160 * .7
 
 var time:float = 0.0
 var lane:int = 0
+var speed:float = 0.0
 var length:float = 0.0
 var is_sustain:bool = false
 var must_hit:bool = false
