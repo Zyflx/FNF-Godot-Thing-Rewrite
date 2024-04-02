@@ -25,6 +25,8 @@ func delete_note(note:Note) -> void:
 # animation shortcut
 func play_anim(index:int, anim:String) -> void:
 	receptors[index % 4].play_anim(anim)
+	if (anim.contains('confirm') and not is_player):
+		receptors[index % 4].reset_time = Conductor.step_crochet * .001
 
 # other shortcuts
 func get_receptor_pos(index:int) -> Array[float]:

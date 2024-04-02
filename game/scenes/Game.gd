@@ -145,7 +145,6 @@ func player_hit(note:Note) -> void:
 				
 func cpu_hit(note:Note) -> void:
 	cpu_strumline.play_anim(note.lane, cpu_strumline.to_dir(note.lane) + ' confirm')
-	cpu_strumline.receptors[note.lane].reset_time = Conductor.step_crochet * .001
 	destroy_note(cpu_strumline, note)
 	
 func note_miss(note:Note) -> void:
