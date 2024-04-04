@@ -63,11 +63,7 @@ func _process(_delta:float) -> void:
 		var strumline:Strumline = plr_strumline if data.must_hit else cpu_strumline
 		
 		var note:Note = Note_Node.instantiate()
-		note.lane = data.lane % 4
-		note.time = data.time
-		note.length = data.length
-		note.is_sustain = data.is_sustain
-		note.must_hit = data.must_hit
+		note.append_data(data)
 		note.speed = song_speed
 		
 		strumline.add_note(note)
@@ -78,15 +74,19 @@ func _process(_delta:float) -> void:
 	for strumline in [plr_strumline, cpu_strumline]:
 		if (strumline.note_group.size() != 0):
 			for note in strumline.note_group:
-				var receptor_pos:Array[float] = strumline.get_receptor_pos(note.lane)
+				note.follow_strumline(strumline)
 				
-				note.position = Vector2(receptor_pos[0], receptor_pos[1] + (Conductor.time - note.time) * (.45 * song_speed))
+				if (note.was_good_hit): cpu_hit(note)
+				if (note.can_cause_miss): note_miss(note)
 				
-				if (note.was_good_hit):
-					cpu_hit(note)
-				
-				if (note.must_hit and note.can_cause_miss):
-					note_miss(note)
+				if (note.data.is_sustain):
+					if (not note.data.must_hit):
+						if (note.self_modulate.a == 0):
+							# my fucking dumbass was using length instead of the sustain size
+							# now this works properly
+							if (note.data.time < note.sustain_kill_threshold):
+								destroy_note(cpu_strumline, note)
+					else: if (note.is_holding): sustain_hit(note)
 				
 func step_hit(step:int) -> void:
 	pass
@@ -97,7 +97,7 @@ func beat_hit(beat:int) -> void:
 func bar_hit(bar:int) -> void:
 	pass
 	
-func _unhandled_key_input(event) -> void:
+func _unhandled_key_input(event:InputEvent) -> void:
 	# took a page out of idk rhythm for inputs lol
 	for i in 4:
 		if (event.is_action_pressed(actions_arr[i])):
@@ -107,10 +107,10 @@ func _unhandled_key_input(event) -> void:
 		
 func key_pressed(key:int) -> void:
 	var hittable_notes:Array[Note] = plr_strumline.note_group.filter(func(n:Note):
-		return n.must_hit and n.can_hit and n.lane == key and not n.was_good_hit and not n.can_cause_miss
+		return n.data.must_hit and n.can_hit and n.data.lane == key and not n.was_good_hit and not n.can_cause_miss
 	)
 	
-	hittable_notes.sort_custom(func(a:Note, b:Note): return a.time < b.time)
+	hittable_notes.sort_custom(func(a:Note, b:Note): return a.data.time < b.data.time)
 
 	if (hittable_notes.size() > 0):
 		var note:Note = hittable_notes[0]
@@ -118,9 +118,9 @@ func key_pressed(key:int) -> void:
 		if (hittable_notes.size() > 1):
 			var behind_note:Note = hittable_notes[1]
 				
-			if (absf(behind_note.time - note.time) < 2.0):
+			if (absf(behind_note.data.time - note.data.time) < 2.0):
 				destroy_note(plr_strumline, behind_note)
-			elif (behind_note.lane == note.lane and behind_note.time < note.time):
+			elif (behind_note.data.lane == note.data.lane and behind_note.data.time < note.data.time):
 				note = behind_note
 					
 		player_hit(note)
@@ -131,9 +131,9 @@ func key_released(key:int) -> void:
 	plr_strumline.play_anim(key, 'static')
 	
 func player_hit(note:Note) -> void:
-	plr_strumline.play_anim(note.lane, plr_strumline.to_dir(note.lane) + ' confirm')
+	plr_strumline.play_anim(note.data.lane, plr_strumline.to_dir(note.data.lane) + ' confirm')
 	
-	var judgement:int = get_judgement(absf(note.time - Conductor.time))
+	var judgement:int = get_judgement(absf(note.data.time - Conductor.time))
 	
 	combo += 1
 	health += judgement_data[judgement][4]
@@ -141,11 +141,25 @@ func player_hit(note:Note) -> void:
 	
 	judge_popup(judgement)
 	
-	destroy_note(plr_strumline, note)
+	if (note.data.is_sustain):
+		note.self_modulate.a = 0
+		note.is_holding = true
+	else: destroy_note(plr_strumline, note)
 				
 func cpu_hit(note:Note) -> void:
-	cpu_strumline.play_anim(note.lane, cpu_strumline.to_dir(note.lane) + ' confirm')
-	destroy_note(cpu_strumline, note)
+	cpu_strumline.play_anim(note.data.lane, cpu_strumline.to_dir(note.data.lane) + ' confirm')
+	if (not note.data.is_sustain): destroy_note(cpu_strumline, note)
+	else: note.self_modulate.a = 0
+	
+# for player sustains
+func sustain_hit(note:Note) -> void:
+	plr_strumline.play_anim(note.data.lane, plr_strumline.to_dir(note.data.lane) + ' confirm')
+	if (Input.is_action_just_released(actions_arr[note.data.lane])):
+		note.is_holding = false
+		note_miss(note)
+	if (note.data.time < note.sustain_kill_threshold):
+		note.is_holding = false
+		destroy_note(plr_strumline, note)
 	
 func note_miss(note:Note) -> void:
 	misses += 1
@@ -165,12 +179,9 @@ func judge_popup(judgement:int = 1) -> void:
 	spr.position = Vector2(get_viewport().size.x * .5, get_viewport().size.y * .5)
 	add_child(spr)
 	
-	var tmr:SceneTreeTimer = get_tree().create_timer(Conductor.crochet * .001)
-	tmr.timeout.connect(func():
-		var twn:Tween = get_tree().create_tween()
-		twn.tween_property(spr, 'modulate', Color.TRANSPARENT, .2)
-		twn.finished.connect(spr.queue_free)
-	)
+	var twn:Tween = create_tween()
+	twn.tween_property(spr, 'modulate', Color.TRANSPARENT, .2).set_delay(Conductor.crochet * .001)
+	twn.finished.connect(spr.queue_free)
 	
 func get_judgement(diff:float = -1) -> JudgementData:
 	for i in judgement_data.keys():
