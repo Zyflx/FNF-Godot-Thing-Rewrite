@@ -4,7 +4,7 @@ const Receptor_Node = preload('res://game/objects/note/Receptor.tscn')
 
 var receptors:Array[Receptor] = []
 var note_group:Array[Note] = []
-var is_player:bool = false
+@export var is_player:bool = false
 
 func _ready() -> void:
 	for i in 4:
