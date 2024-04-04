@@ -9,16 +9,14 @@ var speed:float = 0.0
 # only for player
 var is_holding:bool = false:
 	set(v): if (data.must_hit): is_holding = v
-# adding to the threshold by 1 to give a bit of a delay before the sustain gets killed
-# this is so sustains aren't as strict (hopefully)
 var sustain_kill_threshold:float = 0:
-	get: return (Conductor.time - (sustain.size.y * .5)) + 1 if data.is_sustain else 0
+	get: return (Conductor.time - (sustain.size.y * .5)) if data.is_sustain else 0
 
 var can_hit:bool = false:
 	get: return data.must_hit and data.time >= Conductor.time - (166 * .8) \
 	and data.time <= Conductor.time + (166 * 1)
 var can_cause_miss:bool = false:
-	get: return not is_holding and data.must_hit and position.y > get_viewport().size.y + 30
+	get: return not is_holding and data.must_hit and position.y > get_viewport().size.y + 20
 var was_good_hit:bool = false:
 	get: return not data.must_hit and data.time <= Conductor.time
 

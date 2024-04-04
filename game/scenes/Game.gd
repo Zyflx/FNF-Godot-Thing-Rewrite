@@ -1,8 +1,11 @@
 extends Node2D
 
-@onready var cam_notes:CanvasLayer = CanvasLayer.new()
-
 const Note_Node = preload('res://game/objects/note/Note.tscn')
+
+# ui
+@onready var cam_hud:CanvasLayer = $CamHUD
+@onready var cam_notes:CanvasLayer = $CamNotes
+@onready var game_ui:GameUI = $CamHUD/GameUI
 
 # song stuff
 var song_data
@@ -11,8 +14,8 @@ var song_speed:float = 0.0
 # note stuff
 var note_data
 var cur_note:int = 0
-var plr_strumline:Strumline
-var cpu_strumline:Strumline
+@onready var plr_strumline:Strumline = $CamNotes/PlayerStrumline
+@onready var cpu_strumline:Strumline = $CamNotes/CPUStrumline
 
 # judgement stuff
 enum JudgementData {UNDEFINED = 0, TIER1 = 1, TIER2 = 2, TIER3 = 3, TIER4 = 4}
@@ -44,16 +47,6 @@ func _ready() -> void:
 	
 	song_speed = song_data.info.speed
 	note_data = song_data.notes.duplicate()
-	
-	cam_notes.layer = -1
-	add_child(cam_notes)
-	
-	cpu_strumline = Strumline.new()
-	cam_notes.add_child(cpu_strumline)
-	
-	plr_strumline = Strumline.new()
-	plr_strumline.is_player = true
-	cam_notes.add_child(plr_strumline)
 
 func _process(_delta:float) -> void:
 	while (note_data != null and note_data.size() != 0 and cur_note != note_data.size() and note_data[cur_note].time - Conductor.time < 1800 / song_speed):
@@ -139,6 +132,8 @@ func player_hit(note:Note) -> void:
 	health += judgement_data[judgement][4]
 	score += judgement_data[judgement][3]
 	
+	game_ui.update_accuracy(judgement)
+	
 	judge_popup(judgement)
 	
 	if (note.data.is_sustain):
@@ -154,7 +149,7 @@ func cpu_hit(note:Note) -> void:
 # for player sustains
 func sustain_hit(note:Note) -> void:
 	plr_strumline.play_anim(note.data.lane, plr_strumline.to_dir(note.data.lane) + ' confirm')
-	if (Input.is_action_just_released(actions_arr[note.data.lane])):
+	if (Input.is_action_just_released(actions_arr[note.data.lane]) and note.data.time > note.sustain_kill_threshold - 1):
 		note.is_holding = false
 		note_miss(note)
 	if (note.data.time < note.sustain_kill_threshold):
@@ -163,6 +158,7 @@ func sustain_hit(note:Note) -> void:
 	
 func note_miss(note:Note) -> void:
 	misses += 1
+	game_ui.update_accuracy(JudgementData.UNDEFINED, true)
 	destroy_note(plr_strumline, note)
 				
 func destroy_note(strumline:Strumline, note:Note) -> void:
