@@ -55,6 +55,6 @@ func append_data(data:NoteData) -> void:
 	self.data.must_hit = data.must_hit
 		
 func follow_strumline(strumline:Strumline) -> void:
-	var receptor_pos:Array[float] = strumline.get_receptor_pos(data.lane)
-	position = Vector2(receptor_pos[0], receptor_pos[1] + (Conductor.time - data.time) * (.45 * speed))
-	if (data.is_sustain): sustain.material.set_shader_parameter('strum_coords', Vector2(receptor_pos[0], receptor_pos[1]))
+	var receptor_pos:Vector2 = strumline.get_receptor_pos(data.lane)
+	position = Vector2(receptor_pos.x, receptor_pos.y + (Conductor.time - data.time) * (.45 * speed))
+	if (data.is_sustain): sustain.material.set_shader_parameter('strum_coords', Vector2(receptor_pos.x, receptor_pos.y))

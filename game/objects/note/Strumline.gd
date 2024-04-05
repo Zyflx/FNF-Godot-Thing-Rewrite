@@ -29,8 +29,11 @@ func play_anim(index:int, anim:String) -> void:
 		receptors[index % 4].reset_time = Conductor.step_crochet * .001
 
 # other shortcuts
-func get_receptor_pos(index:int) -> Array[float]:
-	return [receptors[index % 4].position.x, receptors[index % 4].position.y]
+func get_receptor_pos(index:int) -> Vector2:
+	return receptors[index % 4].position
+	
+func get_default_receptor_pos(index:int) -> Vector2:
+	return receptors[index % 4].init_pos
 
 func to_dir(index:int) -> String:
 	return receptors[index % 4].dir_to_name()

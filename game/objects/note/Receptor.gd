@@ -2,12 +2,14 @@ class_name Receptor extends AnimatedSprite2D
 
 var lane:int = 0
 var reset_time:float = 0.0
+var init_pos:Vector2 = Vector2.ZERO
 var is_player:bool = false
 
 func _ready() -> void:
 	scale = Vector2(.7, .7)
 	position = Vector2(100 + (Note.swag_width * lane), get_viewport().size.y - 120)
 	if (is_player): position.x += (get_viewport().size.x * .5) + 100
+	init_pos = position
 	play_anim('static')
 	# animation_finished.connect(func(): play_anim('static'))
 
