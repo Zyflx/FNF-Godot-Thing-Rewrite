@@ -1,4 +1,4 @@
-extends Node2D
+class_name Game extends Node2D
 
 const Note_Node = preload('res://game/objects/note/Note.tscn')
 
@@ -8,11 +8,11 @@ const Note_Node = preload('res://game/objects/note/Note.tscn')
 @onready var game_ui:GameUI = $CamHUD/GameUI
 
 # song stuff
-var song_data
+var song_data:Chart
 var song_speed:float = 0.0
 
 # note stuff
-var note_data
+var note_data:Array[NoteData]
 var cur_note:int = 0
 @onready var plr_strumline:Strumline = $CamNotes/PlayerStrumline
 @onready var cpu_strumline:Strumline = $CamNotes/CPUStrumline
@@ -35,7 +35,7 @@ var actions_arr:Array[String] = ['note_left', 'note_down', 'note_up', 'note_righ
 var score:int = 0
 var misses:int = 0
 var combo:int = 0
-var health:float = 2.0
+var health:float = 50.0
 
 func _ready() -> void:
 	Chart.chart = Chart.load_chart('partner')
@@ -47,12 +47,18 @@ func _ready() -> void:
 	
 	song_speed = song_data.info.speed
 	note_data = song_data.notes.duplicate()
+	
+	ScriptHandler.init_scripts(song_data.info.song)
+	for script in ScriptHandler.scripts_arr: script.game = self
+	ScriptHandler.call_scripts('on_ready', [])
 
-func _process(_delta:float) -> void:
+func _process(delta:float) -> void:
+	ScriptHandler.call_scripts('on_process', [delta])
+	
 	while (note_data != null and note_data.size() != 0 and cur_note != note_data.size() and note_data[cur_note].time - Conductor.time < 1800 / song_speed):
 		if (note_data[cur_note].time - Conductor.time > 1800 / song_speed): break
 		
-		var data = note_data[cur_note]
+		var data:NoteData = note_data[cur_note]
 		var strumline:Strumline = plr_strumline if data.must_hit else cpu_strumline
 		
 		var note:Note = Note_Node.instantiate()
@@ -80,15 +86,17 @@ func _process(_delta:float) -> void:
 							if (note.data.time < note.sustain_kill_threshold):
 								destroy_note(cpu_strumline, note)
 					else: if (note.is_holding): sustain_hit(note)
+					
+		ScriptHandler.call_scripts('on_process_post', [delta])
 				
 func step_hit(step:int) -> void:
-	pass
+	ScriptHandler.call_scripts('step_hit', [step])
 	
 func beat_hit(beat:int) -> void:
-	pass
+	ScriptHandler.call_scripts('beat_hit', [beat])
 	
 func bar_hit(bar:int) -> void:
-	pass
+	ScriptHandler.call_scripts('bar_hit', [bar])
 	
 func _unhandled_key_input(event:InputEvent) -> void:
 	# took a page out of idk rhythm for inputs lol
@@ -136,6 +144,8 @@ func player_hit(note:Note) -> void:
 	
 	judge_popup(judgement)
 	
+	ScriptHandler.call_scripts('player_hit', [note])
+	
 	if (note.data.is_sustain):
 		note.self_modulate.a = 0
 		note.is_holding = true
@@ -143,6 +153,7 @@ func player_hit(note:Note) -> void:
 				
 func cpu_hit(note:Note) -> void:
 	cpu_strumline.play_anim(note.data.lane, cpu_strumline.to_dir(note.data.lane) + ' confirm')
+	ScriptHandler.call_scripts('cpu_hit', [note])
 	if (not note.data.is_sustain): destroy_note(cpu_strumline, note)
 	else: note.self_modulate.a = 0
 	
@@ -159,6 +170,7 @@ func sustain_hit(note:Note) -> void:
 func note_miss(note:Note) -> void:
 	misses += 1
 	game_ui.update_accuracy(JudgementData.UNDEFINED, true)
+	ScriptHandler.call_scripts('note_miss', [note])
 	destroy_note(plr_strumline, note)
 				
 func destroy_note(strumline:Strumline, note:Note) -> void:
@@ -173,7 +185,7 @@ func judge_popup(judgement:int = 1) -> void:
 	spr.velocity.x = -randi_range(0, 10)
 	spr.velocity.y = -randi_range(140, 175)
 	spr.position = Vector2(get_viewport().size.x * .5, get_viewport().size.y * .5)
-	add_child(spr)
+	cam_hud.add_child(spr)
 	
 	var twn:Tween = create_tween()
 	twn.tween_property(spr, 'modulate', Color.TRANSPARENT, .2).set_delay(Conductor.crochet * .001)
