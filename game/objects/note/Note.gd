@@ -10,7 +10,7 @@ var speed:float = 0.0
 var is_holding:bool = false:
 	set(v): if (data.must_hit): is_holding = v
 var sustain_kill_threshold:float = 0:
-	get: return (Conductor.time - (sustain.size.y * .5)) if data.is_sustain else 0
+	get: return (Conductor.time - (data.length * .9)) + 1 if data.is_sustain else 0
 
 var can_hit:bool = false:
 	get: return data.must_hit and data.time >= Conductor.time - (166 * .8) \
