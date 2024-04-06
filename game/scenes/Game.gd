@@ -27,7 +27,7 @@ var cur_note:int = 0
 enum JudgementData {UNDEFINED = 0, TIER1 = 1, TIER2 = 2, TIER3 = 3, TIER4 = 4}
 var judgement_data:Dictionary = {
 	# format: judgement name, timing window, accuracy modifier, score, health gain
-	JudgementData.TIER4: ['sick', 45, 1, 350, .023],
+	JudgementData.TIER4: ['sick', 45, 1, 350, .03],
 	JudgementData.TIER3: ['good', 90, .75, 200, .023],
 	JudgementData.TIER2: ['bad', 135, .4, 100, .015],
 	JudgementData.TIER1: ['shit', 166, .15, 50, .01],
