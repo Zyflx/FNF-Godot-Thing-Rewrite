@@ -1,4 +1,9 @@
+------ FINISHED STUFF ------
 Update input system to use actions instead of preset keys (to elaborate to change the binds right now you have to edit the keys_arr var) -- DONE
 Sustains -- DONE (forgot to do this when i finished them lol)
 Add beat and step shit to conductor -- DONE
-and some more stuff im too lazy to add here
+----------------------------
+
+------ UNFINISHED / IN PROGRESS ------
+Add song select menu
+--------------------------------------
