@@ -1,0 +1,9 @@
+[gd_scene load_steps=3 format=3 uid="uid://yyygbevv8bjj"]
+
+[ext_resource type="SpriteFrames" path="res://assets/images/note/splashes/note_splashes.res" id="1_b8smo"]
+[ext_resource type="Script" path="res://game/objects/note/NoteSplash.gd" id="2_3dd3g"]
+
+[node name="NoteSplash" type="AnimatedSprite2D"]
+sprite_frames = ExtResource("1_b8smo")
+animation = &"note impact 1 blue"
+script = ExtResource("2_3dd3g")

@@ -1,6 +1,7 @@
 class_name Strumline extends Node2D
 
 const Receptor_Node = preload('res://game/objects/note/Receptor.tscn')
+const NoteSplash_Node = preload('res://game/objects/note/NoteSplash.tscn')
 
 var receptors:Array[Receptor] = []
 var note_group:Array[Note] = []
@@ -21,6 +22,13 @@ func add_note(note:Note) -> void:
 func delete_note(note:Note) -> void:
 	note_group.remove_at(note_group.find(note))
 	note.queue_free()
+	
+# splashes
+func spawn_splash(note:Note) -> void:
+	var splash:NoteSplash = NoteSplash_Node.instantiate()
+	splash.spawn_splash(note)
+	splash.position = get_receptor_pos(note.data.lane)
+	add_child(splash)
 
 # animation shortcut
 func play_anim(index:int, anim:String) -> void:

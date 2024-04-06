@@ -28,7 +28,7 @@ func _ready() -> void:
 	play(col_arr[data.lane % 4])
 	if (data.is_sustain):
 		sustain = TextureRect.new()
-		sustain.texture = load('res://assets/images/note/note_assets/' + col_arr[data.lane % 4] + ' hold piece0000.png')
+		sustain.texture = load('res://assets/images/note/' + col_arr[data.lane % 4] + ' hold.png')
 		sustain.size = Vector2(sustain.texture.get_width(), .54 * speed * data.length)
 		sustain.position.x = (sustain.texture.get_width() * .5) - 50
 		sustain.scale.y = -1
@@ -38,7 +38,7 @@ func _ready() -> void:
 		add_child(sustain)
 		
 		end = Sprite2D.new()
-		end.texture = load('res://assets/images/note/note_assets/' + col_arr[data.lane % 4] + ' hold end0000.png')
+		end.texture = load('res://assets/images/note/' + col_arr[data.lane % 4] + ' end.png')
 		end.position.y -= sustain.size.y + (end.texture.get_height() * .5)
 		end.scale.y = -1
 		end.modulate.a = .6

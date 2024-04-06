@@ -38,7 +38,7 @@ var combo:int = 0
 var health:float = 50.0
 
 func _ready() -> void:
-	Chart.chart = Chart.load_chart('partner')
+	Chart.chart = Chart.load_chart('trichael')
 	song_data = Chart.chart
 	
 	Conductor.bpm = song_data.info.bpm
@@ -135,6 +135,8 @@ func player_hit(note:Note) -> void:
 	plr_strumline.play_anim(note.data.lane, plr_strumline.to_dir(note.data.lane) + ' confirm')
 	
 	var judgement:int = get_judgement(absf(note.data.time - Conductor.time))
+	
+	if (judgement == JudgementData.TIER4): plr_strumline.spawn_splash(note)
 	
 	combo += 1
 	health += judgement_data[judgement][4]
