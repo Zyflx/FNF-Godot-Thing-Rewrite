@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://cj5jehwead84g"]
+
+[ext_resource type="Script" path="res://game/objects/JudgeSprite.gd" id="1_ta0uw"]
+
+[node name="JudgeSprite" type="Sprite2D"]
+script = ExtResource("1_ta0uw")

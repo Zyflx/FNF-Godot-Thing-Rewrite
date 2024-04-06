@@ -1,11 +1,14 @@
-class_name GameUI extends Node
+class_name GameUI extends CanvasLayer
 
 @onready var game:Node2D = get_tree().current_scene
 @onready var score_txt:Label = $ScoreTxt
+@onready var health_bar:ProgressBar = $HealthBar
 
 var accuracy:float = 0.0
 var total:float = 0.0
 var played:int = 0
+
+var health:float = 50.0
 
 var rank_map:Dictionary = {
 	100: 'S+', 95: 'S',
@@ -15,7 +18,12 @@ var rank_map:Dictionary = {
 }
 
 func _ready() -> void:
+	health_bar.position = Vector2(350, 50)
 	score_txt.position = Vector2(400, 100)
+	
+func _process(delta:float) -> void:
+	health = lerpf(health, game.health, delta * 8)
+	health_bar.value = health
 	
 func update_score_txt() -> void:
 	var acc:float = round_decimal(accuracy, 2)

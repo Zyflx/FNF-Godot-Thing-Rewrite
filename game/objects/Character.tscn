@@ -1,0 +1,9 @@
+[gd_scene load_steps=3 format=3 uid="uid://dyh87ayc2loqi"]
+
+[ext_resource type="Script" path="res://game/objects/Character.gd" id="1_rcg34"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_8tkod"]
+
+[node name="Character" type="AnimatedSprite2D"]
+sprite_frames = SubResource("SpriteFrames_8tkod")
+script = ExtResource("1_rcg34")

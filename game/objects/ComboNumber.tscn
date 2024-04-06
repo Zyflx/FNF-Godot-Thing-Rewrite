@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://bpse1lmihvqy1"]
+
+[ext_resource type="Script" path="res://game/objects/ComboNumber.gd" id="1_j83q4"]
+
+[node name="ComboNumber" type="Sprite2D"]
+script = ExtResource("1_j83q4")

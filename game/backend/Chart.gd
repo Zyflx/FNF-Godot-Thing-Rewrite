@@ -20,6 +20,7 @@ class JsonData extends Resource:
 		
 var info:JsonData = null
 var notes:Array[NoteData] = []
+var section_data:Array = []
 static var chart:Chart
 
 static func load_chart(song:String) -> Chart:
@@ -27,6 +28,8 @@ static func load_chart(song:String) -> Chart:
 	if (not FileAccess.file_exists(path)): return
 	var json:Variant = JSON.parse_string((FileAccess.open(path, FileAccess.READ).get_as_text())).song
 	var c:Chart = Chart.new()
+	
+	c.section_data = json.notes
 	
 	c.info = JsonData.new(
 		json.song, json.player1, json.player2, 'stage' if json.stage == null else json.stage,

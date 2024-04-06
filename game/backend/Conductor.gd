@@ -52,6 +52,10 @@ func play_music() -> void:
 	inst.play()
 	if (voices.stream != null): voices.play()
 	
+func stop_music() -> void:
+	inst.stop()
+	if (voices.stream != null): voices.stop()
+	
 func sync_music() -> void:
 	sync_stream(inst)
 	sync_stream(voices)
@@ -60,3 +64,8 @@ func sync_stream(stream:AudioStreamPlayer) -> void:
 	if (stream == null or not stream.is_playing()): return
 	var stream_time:float = stream.get_playback_position() * 1000.0
 	if (absf(time - stream_time) > 20.0): stream.seek(time * .001)
+	
+func reset() -> void:
+	beat = 0; _beat_t = 0;
+	step = 0; _step_t = 0;
+	bar = 0; time = 0;

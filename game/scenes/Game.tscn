@@ -1,9 +1,23 @@
-[gd_scene load_steps=5 format=3 uid="uid://ch5s5o7wjrbfj"]
+[gd_scene load_steps=12 format=3 uid="uid://ch5s5o7wjrbfj"]
 
 [ext_resource type="Script" path="res://game/scenes/Game.gd" id="1_lhvvv"]
 [ext_resource type="Script" path="res://game/ui/GameUI.gd" id="2_idyur"]
 [ext_resource type="Script" path="res://game/objects/note/Strumline.gd" id="2_r3ej1"]
+[ext_resource type="Script" path="res://game/objects/Character.gd" id="2_ubb1j"]
+[ext_resource type="Texture2D" uid="uid://drhsyp4knqt3m" path="res://assets/images/ui/healthBar.png" id="3_qf6w8"]
 [ext_resource type="FontFile" uid="uid://b6neu3gwqpjma" path="res://assets/fonts/vcr.ttf" id="3_rkdvy"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_0dpec"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_asaha"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_6c6cx"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_6os5p"]
+bg_color = Color(1, 0, 0, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_r7176"]
+bg_color = Color(0.4, 1, 0.2, 1)
 
 [node name="Game" type="Node2D"]
 script = ExtResource("1_lhvvv")
@@ -12,13 +26,52 @@ script = ExtResource("1_lhvvv")
 
 [node name="Voices" type="AudioStreamPlayer" parent="."]
 
-[node name="CamHUD" type="CanvasLayer" parent="."]
-layer = -1
+[node name="CamGame" type="Camera2D" parent="."]
+zoom = Vector2(0.8, 0.8)
+position_smoothing_enabled = true
+position_smoothing_speed = 3.0
 
-[node name="GameUI" type="Node" parent="CamHUD"]
+[node name="Spectator" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SpriteFrames_0dpec")
+script = ExtResource("2_ubb1j")
+is_gf = true
+cur_char = "gf"
+
+[node name="Opponent" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SpriteFrames_asaha")
+script = ExtResource("2_ubb1j")
+
+[node name="Boyfriend" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SpriteFrames_6c6cx")
+script = ExtResource("2_ubb1j")
+is_player = true
+
+[node name="GameUI" type="CanvasLayer" parent="."]
 script = ExtResource("2_idyur")
 
-[node name="ScoreTxt" type="Label" parent="CamHUD/GameUI"]
+[node name="PlayerStrumline" type="Node2D" parent="GameUI"]
+script = ExtResource("2_r3ej1")
+is_player = true
+
+[node name="CPUStrumline" type="Node2D" parent="GameUI"]
+script = ExtResource("2_r3ej1")
+
+[node name="HealthBar" type="ProgressBar" parent="GameUI"]
+clip_contents = true
+offset_right = 600.0
+offset_bottom = 18.0
+theme_override_styles/background = SubResource("StyleBoxFlat_6os5p")
+theme_override_styles/fill = SubResource("StyleBoxFlat_r7176")
+step = 0.0
+value = 50.0
+fill_mode = 1
+show_percentage = false
+
+[node name="BG" type="Sprite2D" parent="GameUI/HealthBar"]
+position = Vector2(300, 9)
+texture = ExtResource("3_qf6w8")
+
+[node name="ScoreTxt" type="Label" parent="GameUI"]
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
@@ -38,13 +91,3 @@ text = "Score: 0 | Misses: 0 | Accuracy: [0% | N/A]"
 horizontal_alignment = 1
 vertical_alignment = 1
 text_direction = 3
-
-[node name="CamNotes" type="CanvasLayer" parent="."]
-layer = -2
-
-[node name="PlayerStrumline" type="Node2D" parent="CamNotes"]
-script = ExtResource("2_r3ej1")
-is_player = true
-
-[node name="CPUStrumline" type="Node2D" parent="CamNotes"]
-script = ExtResource("2_r3ej1")

@@ -1,11 +1,12 @@
 class_name Game extends Node2D
 
 const Note_Node = preload('res://game/objects/note/Note.tscn')
+const JudgeSprite_Node = preload('res://game/objects/JudgeSprite.tscn')
+const ComboNumber_Node = preload('res://game/objects/ComboNumber.tscn')
 
 # ui
-@onready var cam_hud:CanvasLayer = $CamHUD
-@onready var cam_notes:CanvasLayer = $CamNotes
-@onready var game_ui:GameUI = $CamHUD/GameUI
+@onready var cam_game:Camera2D = $CamGame
+@onready var game_ui:GameUI = $GameUI
 
 # song stuff
 var song_data:Chart
@@ -14,8 +15,13 @@ var song_speed:float = 0.0
 # note stuff
 var note_data:Array[NoteData]
 var cur_note:int = 0
-@onready var plr_strumline:Strumline = $CamNotes/PlayerStrumline
-@onready var cpu_strumline:Strumline = $CamNotes/CPUStrumline
+@onready var plr_strumline:Strumline = $GameUI/PlayerStrumline
+@onready var cpu_strumline:Strumline = $GameUI/CPUStrumline
+
+# characters
+@onready var bf:Character = $Boyfriend
+@onready var opponent:Character = $Opponent
+@onready var spectator:Character = $Spectator
 
 # judgement stuff
 enum JudgementData {UNDEFINED = 0, TIER1 = 1, TIER2 = 2, TIER3 = 3, TIER4 = 4}
@@ -50,10 +56,26 @@ func _ready() -> void:
 	
 	ScriptHandler.init_scripts(song_data.info.song)
 	for script in ScriptHandler.scripts_arr: script.game = self
+	
+	bf.position = Vector2(200, 350)
+	opponent.position = Vector2(-100, 350)
+	spectator.position.x -= 300
+	
+	move_camera(song_data.section_data[0].mustHitSection)
+	
 	ScriptHandler.call_scripts('on_ready', [])
 
 func _process(delta:float) -> void:
 	ScriptHandler.call_scripts('on_process', [delta])
+	
+	if (Input.is_action_just_pressed('reset_state')):
+		Conductor.reset()
+		Conductor.stop_music()
+		get_tree().reload_current_scene()
+	
+	cam_game.zoom = Vector2(lerpf(.8, cam_game.zoom.x, exp(-delta * 6)), lerpf(.8, cam_game.zoom.y, exp(-delta * 6)))
+	game_ui.scale = Vector2(lerpf(1, game_ui.scale.x, exp(-delta * 6)), lerpf(1, game_ui.scale.y, exp(-delta * 6)))
+	game_ui.offset = Vector2(lerpf(0, game_ui.offset.x, exp(-delta * 6)), lerpf(0, game_ui.offset.y, exp(-delta * 6)))
 	
 	while (note_data != null and note_data.size() != 0 and cur_note != note_data.size() and note_data[cur_note].time - Conductor.time < 1800 / song_speed):
 		if (note_data[cur_note].time - Conductor.time > 1800 / song_speed): break
@@ -66,7 +88,6 @@ func _process(delta:float) -> void:
 		note.speed = song_speed
 		
 		strumline.add_note(note)
-		cam_notes.add_child(note)
 		
 		cur_note += 1
 	
@@ -93,10 +114,32 @@ func step_hit(step:int) -> void:
 	ScriptHandler.call_scripts('step_hit', [step])
 	
 func beat_hit(beat:int) -> void:
+	# print('beat hit %s' % beat)
+	if (beat % 2 == 0):
+		if (not bf.animation.contains('sing')): bf.dance()
+		if (not opponent.animation.contains('sing')): opponent.dance()
+	spectator.dance()
 	ScriptHandler.call_scripts('beat_hit', [beat])
 	
 func bar_hit(bar:int) -> void:
+	cam_game.zoom.x += .03
+	cam_game.zoom.y += .03
+	
+	game_ui.scale.x += .03
+	game_ui.scale.y += .03
+	game_ui.offset = Vector2(-20, -10)
+
+	if (song_data.section_data[bar] != null):
+		move_camera(song_data.section_data[bar].mustHitSection)
+		if (song_data.section_data[bar].changeBPM and Conductor.bpm != song_data.section_data[bar].bpm):
+			Conductor.bpm = song_data.section_data[bar].bpm
+			
 	ScriptHandler.call_scripts('bar_hit', [bar])
+	
+func move_camera(must_hit:bool) -> void:
+	var who:Character = bf if must_hit else opponent
+	cam_game.position = who.get_cam_pos()
+	ScriptHandler.call_scripts('on_move_camera', ['bf' if must_hit else 'opponent'])
 	
 func _unhandled_key_input(event:InputEvent) -> void:
 	# took a page out of idk rhythm for inputs lol
@@ -134,12 +177,14 @@ func key_released(key:int) -> void:
 func player_hit(note:Note) -> void:
 	plr_strumline.play_anim(note.data.lane, plr_strumline.to_dir(note.data.lane) + ' confirm')
 	
+	bf.sing(note.data.lane)
+	
 	var judgement:int = get_judgement(absf(note.data.time - Conductor.time))
 	
 	if (judgement == JudgementData.TIER4): plr_strumline.spawn_splash(note)
 	
 	combo += 1
-	health += judgement_data[judgement][4]
+	health += judgement_data[judgement][4] * 50.0
 	score += judgement_data[judgement][3]
 	
 	game_ui.update_accuracy(judgement)
@@ -155,6 +200,7 @@ func player_hit(note:Note) -> void:
 				
 func cpu_hit(note:Note) -> void:
 	cpu_strumline.play_anim(note.data.lane, cpu_strumline.to_dir(note.data.lane) + ' confirm')
+	opponent.sing(note.data.lane)
 	ScriptHandler.call_scripts('cpu_hit', [note])
 	if (not note.data.is_sustain): destroy_note(cpu_strumline, note)
 	else: note.self_modulate.a = 0
@@ -162,6 +208,7 @@ func cpu_hit(note:Note) -> void:
 # for player sustains
 func sustain_hit(note:Note) -> void:
 	plr_strumline.play_anim(note.data.lane, plr_strumline.to_dir(note.data.lane) + ' confirm')
+	bf.sing(note.data.lane)
 	if (Input.is_action_just_released(actions_arr[note.data.lane]) and note.data.time > note.sustain_kill_threshold - 1):
 		note.is_holding = false
 		note_miss(note)
@@ -171,6 +218,7 @@ func sustain_hit(note:Note) -> void:
 	
 func note_miss(note:Note) -> void:
 	misses += 1
+	health -= (.0475 * 50.0)
 	game_ui.update_accuracy(JudgementData.UNDEFINED, true)
 	ScriptHandler.call_scripts('note_miss', [note])
 	destroy_note(plr_strumline, note)
@@ -179,19 +227,35 @@ func destroy_note(strumline:Strumline, note:Note) -> void:
 	strumline.delete_note(note)
 	
 func judge_popup(judgement:int = 1) -> void:
-	var spr:FunkSprite = FunkSprite.new()
-	spr.scale = Vector2(.7, .7)
-	spr.texture = load('res://assets/images/ui/' + judgement_data[judgement][0] + '.png')
-	spr.active = true
-	spr.acceleration.y = 550
-	spr.velocity.x = -randi_range(0, 10)
-	spr.velocity.y = -randi_range(140, 175)
+	var spr:JudgeSprite = JudgeSprite_Node.instantiate()
+	spr.spawn(judgement_data[judgement][0])
 	spr.position = Vector2(get_viewport().size.x * .5, get_viewport().size.y * .5)
-	cam_hud.add_child(spr)
+	game_ui.add_child(spr)
 	
 	var twn:Tween = create_tween()
-	twn.tween_property(spr, 'modulate', Color.TRANSPARENT, .2).set_delay(Conductor.crochet * .001)
+	twn.tween_property(spr, 'modulate:a', 0, .2).set_delay(Conductor.crochet * .001)
 	twn.finished.connect(spr.queue_free)
+	
+	var sep_score:Array[int] = []
+	if (combo >= 1000): sep_score.append(floori(combo * .001) % 10)
+	sep_score.append(floori(combo * .01) % 10)
+	sep_score.append(floori(combo * .1) % 10)
+	sep_score.append(combo % 10)
+	
+	var loop:int = 0
+	
+	for i in sep_score:
+		var num:ComboNumber = ComboNumber_Node.instantiate()
+		num.spawn(i)
+		num.position.x = spr.position.x - 150 + (43 * loop)
+		num.position.y = spr.position.y + 95
+		game_ui.add_child(num)
+		
+		var ntwn:Tween = create_tween()
+		ntwn.tween_property(num, 'modulate:a', 0, .2).set_delay(Conductor.crochet * .002)
+		ntwn.finished.connect(num.queue_free)
+		
+		loop += 1
 	
 func get_judgement(diff:float = -1) -> JudgementData:
 	for i in judgement_data.keys():

@@ -21,10 +21,9 @@ func _process(delta:float) -> void:
 		.5 * (_calc_velocity(velocity.y, acceleration.y, delta) - velocity.y)
 	)
 	
-	velocity.x += velocity_delta.x
+	velocity.x += velocity_delta.x * 2.0
+	velocity.y += velocity_delta.y * 2.0
 	position.x += velocity.x * delta
-	
-	velocity.y += velocity_delta.y
 	position.y += velocity.y * delta
 	
 # calculates the velocity of this FunkSprite.
