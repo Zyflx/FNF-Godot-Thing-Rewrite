@@ -35,7 +35,7 @@ func _process(delta:float) -> void:
 				bar += 1
 				if (get_tree().current_scene.has_method('bar_hit')):
 					get_tree().current_scene.callv('bar_hit', [bar])
-		if (time > (_step_t + step)):
+		if (time > (_step_t + step_crochet)):
 			_step_t += step_crochet
 			step += 1
 			if (get_tree().current_scene.has_method('step_hit')):
