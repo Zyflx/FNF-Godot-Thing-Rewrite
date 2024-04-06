@@ -38,7 +38,7 @@ static func load_chart(song:String) -> Chart:
 	
 	for sec in json.notes:
 		for note in sec.sectionNotes:
-			if (note[1] == -1): continue
+			if (note[1] == -1 or note[2] is String): continue
 			var time:float = maxf(0, note[0])
 			var lane:int = int(note[1]) % 4
 			var length:float = maxf(0, note[2])
