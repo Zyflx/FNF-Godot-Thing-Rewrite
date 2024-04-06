@@ -38,7 +38,7 @@ var combo:int = 0
 var health:float = 50.0
 
 func _ready() -> void:
-	Chart.chart = Chart.load_chart('trichael')
+	Chart.chart = Chart.load_chart('partner')
 	song_data = Chart.chart
 	
 	Conductor.bpm = song_data.info.bpm
