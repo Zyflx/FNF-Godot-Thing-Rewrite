@@ -69,7 +69,6 @@ func init_music(song:String, needs_voices:bool) -> void:
 		voices.stream = load('res://assets/songs/' + song.replace(' ', '-').to_lower() + '/audio/Voices.ogg')
 	
 func play_music() -> void:
-	active = true
 	inst.play()
 	if (voices.stream != null): voices.play()
 	
@@ -83,7 +82,7 @@ func sync_music() -> void:
 	sync_stream(voices)
 	
 func sync_stream(stream:AudioStreamPlayer) -> void:
-	if (stream == null or not stream.is_playing()): return
+	if (stream == null or not stream.playing): return
 	var stream_time:float = stream.get_playback_position() * 1000.0
 	if (absf(time - stream_time) > 20.0): stream.seek(time * .001)
 	

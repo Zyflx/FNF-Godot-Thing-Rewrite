@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://5sqi3hrxn78t"
-path="res://.godot/imported/num2.png-d35d18ad90ea2aff9dce8b19a5f72eeb.ctex"
+uid="uid://8cx24gswyr3a"
+path="res://.godot/imported/go.png-96b439557eeb1112a7038272345ab50e.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/images/ui/num2.png"
-dest_files=["res://.godot/imported/num2.png-d35d18ad90ea2aff9dce8b19a5f72eeb.ctex"]
+source_file="res://assets/images/ui/countdown/go.png"
+dest_files=["res://.godot/imported/go.png-96b439557eeb1112a7038272345ab50e.ctex"]
 
 [params]
 

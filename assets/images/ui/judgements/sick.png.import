@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://jteqjf4h5t5k"
-path="res://.godot/imported/num5.png-887411f4400e36456c6bc3151985b0c0.ctex"
+uid="uid://cbiv6lvi4i4h1"
+path="res://.godot/imported/sick.png-6923f8ea3975ec05957477f1c6bea2a4.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/images/ui/num5.png"
-dest_files=["res://.godot/imported/num5.png-887411f4400e36456c6bc3151985b0c0.ctex"]
+source_file="res://assets/images/ui/judgements/sick.png"
+dest_files=["res://.godot/imported/sick.png-6923f8ea3975ec05957477f1c6bea2a4.ctex"]
 
 [params]
 

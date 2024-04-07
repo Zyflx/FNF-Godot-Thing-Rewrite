@@ -12,6 +12,13 @@ var default_zoom:float = .8
 # song stuff
 var song_data:Chart
 var song_speed:float = 0.0
+var started_song:bool = false
+
+# countdown
+@onready var countdown_tmr:Timer = Timer.new()
+var countdown_loops:int = 0
+var countdown_sprs:Array[String] = ['ready', 'set', 'go']
+var countdown_sounds:Array[String] = ['intro3', 'intro2', 'intro1', 'introGo']
 
 # note stuff
 var note_data:Array[NoteData]
@@ -49,7 +56,6 @@ func _ready() -> void:
 
 	Conductor.bpm = song_data.info.bpm
 	Conductor.init(song_data.info.song, song_data.info.needs_voices, [step_hit, beat_hit, bar_hit, song_ended])
-	Conductor.play_music()
 	
 	song_speed = song_data.info.speed
 	note_data = song_data.notes.duplicate()
@@ -63,6 +69,9 @@ func _ready() -> void:
 	
 	move_camera(song_data.section_data[0].mustHitSection)
 	
+	add_child(countdown_tmr)
+	init_countdown()
+	
 	ScriptHandler.call_scripts('on_ready', [])
 
 func _process(delta:float) -> void:
@@ -74,6 +83,10 @@ func _process(delta:float) -> void:
 		
 	if (Input.is_action_just_pressed('back_to_menu')):
 		song_ended()
+		
+	if (Conductor.time >= 0 and not started_song):
+		started_song = true
+		Conductor.play_music()
 	
 	cam_game.zoom = Vector2(lerpf(default_zoom, cam_game.zoom.x, exp(-delta * 6)), lerpf(default_zoom, cam_game.zoom.y, exp(-delta * 6)))
 	game_ui.scale = Vector2(lerpf(1, game_ui.scale.x, exp(-delta * 6)), lerpf(1, game_ui.scale.y, exp(-delta * 6)))
@@ -93,9 +106,9 @@ func _process(delta:float) -> void:
 		ScriptHandler.call_scripts('on_note_spawn', [note])
 		
 		cur_note += 1
-					
+		
 	ScriptHandler.call_scripts('on_process_post', [delta])
-				
+	
 func step_hit(step:int) -> void:
 	ScriptHandler.call_scripts('step_hit', [step])
 	
@@ -121,6 +134,39 @@ func bar_hit(bar:int) -> void:
 			Conductor.bpm = song_data.section_data[bar].bpm
 			
 	ScriptHandler.call_scripts('bar_hit', [bar])
+	
+func init_countdown() -> void:
+	if (countdown_loops == 0):
+		Conductor.time = -Conductor.crochet * 5.0
+		Conductor.active = true
+	
+	countdown_tmr.start(Conductor.crochet * .001)
+	
+	await countdown_tmr.timeout
+	
+	if (countdown_loops < 4):
+		if (countdown_loops >= 1):
+			var count_spr:Sprite2D = Sprite2D.new()
+			count_spr.texture = load('res://assets/images/ui/countdown/%s.png' % countdown_sprs[countdown_loops - 1])
+			count_spr.position = Vector2(get_viewport().size.x * .5, get_viewport().size.y * .5)
+			game_ui.add_child(count_spr)
+						
+			var count_spr_twn:PropertyTweener = create_tween().tween_property(count_spr, 'modulate:a', 0, Conductor.crochet * .001)
+			count_spr_twn.set_trans(Tween.TRANS_CUBIC)
+			count_spr_twn.finished.connect(count_spr.queue_free)
+			
+			bf.dance()
+			opponent.dance()
+			spectator.dance()
+			
+		var sound:AudioStreamPlayer = AudioStreamPlayer.new()
+		sound.stream = load('res://assets/sounds/%s.ogg' % countdown_sounds[countdown_loops])
+		add_child(sound)
+		sound.play()
+		sound.finished.connect(sound.queue_free)
+		
+	countdown_loops += 1
+	init_countdown()
 
 func song_ended() -> void:
 	Conductor.stop_music()
