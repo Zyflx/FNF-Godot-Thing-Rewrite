@@ -90,23 +90,6 @@ func _process(delta:float) -> void:
 		strumline.add_note(note)
 		
 		cur_note += 1
-	
-	for strumline in [plr_strumline, cpu_strumline]:
-		if (strumline.note_group.size() != 0):
-			for note in strumline.note_group:
-				note.follow_strumline(strumline)
-				
-				if (note.was_good_hit): cpu_hit(note)
-				if (note.can_cause_miss): note_miss(note)
-				
-				if (note.data.is_sustain):
-					if (not note.data.must_hit):
-						if (note.self_modulate.a == 0):
-							# my fucking dumbass was using length instead of the sustain size
-							# now this works properly
-							if (note.data.time < note.sustain_kill_threshold):
-								destroy_note(cpu_strumline, note)
-					else: if (note.is_holding): sustain_hit(note)
 					
 		ScriptHandler.call_scripts('on_process_post', [delta])
 				

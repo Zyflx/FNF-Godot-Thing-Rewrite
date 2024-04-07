@@ -7,6 +7,8 @@ var receptors:Array[Receptor] = []
 var note_group:Array[Note] = []
 @export var is_player:bool = false
 
+@onready var game:Node2D = get_tree().current_scene
+
 func _ready() -> void:
 	for i in 4:
 		var receptor:Receptor = Receptor_Node.instantiate()
@@ -14,9 +16,25 @@ func _ready() -> void:
 		receptor.is_player = is_player
 		receptors.append(receptor)
 		add_child(receptor)
+		
+func _process(delta:float) -> void:
+	if (note_group.size() != 0):
+		for note in note_group:
+			note.follow_strumline(self)
+				
+			if (note.was_good_hit): game.cpu_hit(note)
+			if (note.can_cause_miss): game.note_miss(note)
+				
+			if (note.data.is_sustain):
+				if (not note.data.must_hit):
+					if (note.self_modulate.a == 0):
+						if (note.data.time < note.sustain_kill_threshold):
+							game.destroy_note(self, note)
+				else: if (note.is_holding): game.sustain_hit(note)
 	
 func add_note(note:Note) -> void:
 	note_group.append(note)
+	add_child(note)
 	# note_group.sort_custom(func(a:Note, b:Note): return a.time < b.time)
 
 func delete_note(note:Note) -> void:
