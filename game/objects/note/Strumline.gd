@@ -17,7 +17,7 @@ func _ready() -> void:
 		receptors.append(receptor)
 		add_child(receptor)
 		
-func _process(delta:float) -> void:
+func _process(_delta:float) -> void:
 	if (note_group.size() != 0):
 		for note in note_group:
 			note.follow_strumline(self)

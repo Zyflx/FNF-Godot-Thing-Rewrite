@@ -45,11 +45,10 @@ var combo:int = 0
 var health:float = 50.0
 
 func _ready() -> void:
-	Chart.chart = Chart.load_chart('partner')
 	song_data = Chart.chart
-	
+
 	Conductor.bpm = song_data.info.bpm
-	Conductor.init_music(song_data.info.song, song_data.info.needs_voices)
+	Conductor.init(song_data.info.song, song_data.info.needs_voices, [step_hit, beat_hit, bar_hit, song_ended])
 	Conductor.play_music()
 	
 	song_speed = song_data.info.speed
@@ -70,9 +69,11 @@ func _process(delta:float) -> void:
 	ScriptHandler.call_scripts('on_process', [delta])
 	
 	if (Input.is_action_just_pressed('reset_state')):
-		Conductor.reset()
 		Conductor.stop_music()
 		get_tree().reload_current_scene()
+		
+	if (Input.is_action_just_pressed('back_to_menu')):
+		song_ended()
 	
 	cam_game.zoom = Vector2(lerpf(default_zoom, cam_game.zoom.x, exp(-delta * 6)), lerpf(default_zoom, cam_game.zoom.y, exp(-delta * 6)))
 	game_ui.scale = Vector2(lerpf(1, game_ui.scale.x, exp(-delta * 6)), lerpf(1, game_ui.scale.y, exp(-delta * 6)))
@@ -115,10 +116,15 @@ func bar_hit(bar:int) -> void:
 
 	if (song_data.section_data[bar] != null):
 		move_camera(song_data.section_data[bar].mustHitSection)
-		if (song_data.section_data[bar].changeBPM and Conductor.bpm != song_data.section_data[bar].bpm):
+		var has_change:bool = song_data.section_data[bar].has('changeBPM') and song_data.section_data[bar].changeBPM
+		if (has_change and Conductor.bpm != song_data.section_data[bar].bpm):
 			Conductor.bpm = song_data.section_data[bar].bpm
 			
 	ScriptHandler.call_scripts('bar_hit', [bar])
+
+func song_ended() -> void:
+	Conductor.stop_music()
+	get_tree().change_scene_to_file('res://game/scenes/SongSelect.tscn')
 	
 func move_camera(must_hit:bool) -> void:
 	var who:Character = bf if must_hit else opponent

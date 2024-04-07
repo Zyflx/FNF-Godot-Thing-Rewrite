@@ -32,8 +32,9 @@ static func load_chart(song:String) -> Chart:
 	c.section_data = json.notes
 	
 	c.info = JsonData.new(
-		json.song, json.player1, json.player2, 'stage' if json.stage == null else json.stage,
-		json.needsVoices, json.bpm, json.speed
+		# fuck you kade engine
+		json.songName if json.has('songName') else json.song, json.player1, json.player2,
+		json.stage if json.has('stage') else 'stage', json.needsVoices, json.bpm, json.speed
 	)
 	
 	for sec in json.notes:

@@ -1,11 +1,18 @@
 extends Node
 
+signal step_hit(step:int)
+signal beat_hit(beat:int)
+signal bar_hit(bar:int)
+signal song_ended()
+
+var active:bool = true
+
 var time:float = 0.0;
 
 var bpm:float = 100.0:
 	set(new_bpm):
 		bpm = new_bpm
-		crochet = (60.0 / bpm) * 1000.0
+		crochet = (60.0 / new_bpm) * 1000.0
 		step_crochet = crochet * .25
 var crochet:float = (60.0 / bpm) * 1000.0
 var step_crochet:float = crochet * .25
@@ -21,6 +28,8 @@ var inst:AudioStreamPlayer
 var voices:AudioStreamPlayer
 
 func _process(delta:float) -> void:
+	if (not active): return
+	
 	time += delta * 1000.0
 
 	if (time >= 0):
@@ -29,17 +38,28 @@ func _process(delta:float) -> void:
 		if (time > (_beat_t + crochet)):
 			_beat_t += crochet
 			beat += 1
-			if (get_tree().current_scene.has_method('beat_hit')):
-				get_tree().current_scene.callv('beat_hit', [beat])
+			beat_hit.emit(beat)
 			if (beat % 4 == 0):
 				bar += 1
-				if (get_tree().current_scene.has_method('bar_hit')):
-					get_tree().current_scene.callv('bar_hit', [bar])
+				bar_hit.emit(bar)
 		if (time > (_step_t + step_crochet)):
 			_step_t += step_crochet
 			step += 1
-			if (get_tree().current_scene.has_method('step_hit')):
-				get_tree().current_scene.callv('step_hit', [step])
+			step_hit.emit(step)
+			
+		if (time >= inst.stream.get_length() * 1000.0):
+			song_ended.emit()
+			
+func init(song:String, needs_voices:bool, funcs:Array[Callable]):
+	reset()
+	init_music(song, needs_voices)
+	init_signals(funcs)
+			
+func init_signals(funcs:Array[Callable]) -> void:
+	step_hit.connect(funcs[0])
+	beat_hit.connect(funcs[1])
+	bar_hit.connect(funcs[2])
+	song_ended.connect(funcs[3])
 	
 func init_music(song:String, needs_voices:bool) -> void:
 	inst = get_tree().current_scene.get_node('Inst')
@@ -49,10 +69,12 @@ func init_music(song:String, needs_voices:bool) -> void:
 		voices.stream = load('res://assets/songs/' + song.replace(' ', '-').to_lower() + '/audio/Voices.ogg')
 	
 func play_music() -> void:
+	active = true
 	inst.play()
 	if (voices.stream != null): voices.play()
 	
 func stop_music() -> void:
+	reset()
 	inst.stop()
 	if (voices.stream != null): voices.stop()
 	
