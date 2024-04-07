@@ -6,11 +6,13 @@ static var swag_width:float = 160 * .7
 
 var data:NoteData = NoteData.new(0, 0, 0, false, false)
 var speed:float = 0.0
+var copy_rotation:bool = true
+var copy_alpha:bool = true
 # only for player
 var is_holding:bool = false:
 	set(v): if (data.must_hit): is_holding = v
 var sustain_kill_threshold:float = 0:
-	get: return (Conductor.time - (data.length * .9)) + 1 if data.is_sustain else 0
+	get: return (Conductor.time - (data.length * .9)) + 1
 
 var can_hit:bool = false:
 	get: return data.must_hit and data.time >= Conductor.time - (166 * .8) \
@@ -57,4 +59,6 @@ func append_data(data:NoteData) -> void:
 func follow_strumline(strumline:Strumline) -> void:
 	var receptor_pos:Vector2 = strumline.get_receptor_pos(data.lane)
 	position = Vector2(receptor_pos.x, receptor_pos.y + (Conductor.time - data.time) * (.45 * speed))
+	if (copy_rotation): rotation = strumline.receptors[data.lane % 4].rotation
+	if (copy_alpha): modulate.a = strumline.receptors[data.lane % 4].modulate.a
 	if (data.is_sustain): sustain.material.set_shader_parameter('strum_coords', Vector2(receptor_pos.x, receptor_pos.y))

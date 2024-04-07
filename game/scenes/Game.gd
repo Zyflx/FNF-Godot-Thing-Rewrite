@@ -89,6 +89,8 @@ func _process(delta:float) -> void:
 		
 		strumline.add_note(note)
 		
+		ScriptHandler.call_scripts('on_note_spawn', [note])
+		
 		cur_note += 1
 					
 	ScriptHandler.call_scripts('on_process_post', [delta])
