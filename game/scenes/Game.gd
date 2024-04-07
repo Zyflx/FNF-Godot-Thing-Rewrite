@@ -91,7 +91,7 @@ func _process(delta:float) -> void:
 		
 		cur_note += 1
 					
-		ScriptHandler.call_scripts('on_process_post', [delta])
+	ScriptHandler.call_scripts('on_process_post', [delta])
 				
 func step_hit(step:int) -> void:
 	ScriptHandler.call_scripts('step_hit', [step])
