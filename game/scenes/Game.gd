@@ -124,6 +124,7 @@ func bar_hit(bar:int) -> void:
 
 func song_ended() -> void:
 	Conductor.stop_music()
+	ScriptHandler.free_scripts()
 	get_tree().change_scene_to_file('res://game/scenes/SongSelect.tscn')
 	
 func move_camera(must_hit:bool) -> void:
