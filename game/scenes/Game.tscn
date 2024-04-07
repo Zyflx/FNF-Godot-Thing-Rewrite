@@ -46,18 +46,23 @@ sprite_frames = SubResource("SpriteFrames_6c6cx")
 script = ExtResource("2_ubb1j")
 is_player = true
 
-[node name="GameUI" type="CanvasLayer" parent="."]
+[node name="UI" type="CanvasLayer" parent="."]
+
+[node name="GameUI" type="Control" parent="UI"]
+layout_mode = 3
+anchors_preset = 0
 script = ExtResource("2_idyur")
 
-[node name="PlayerStrumline" type="Node2D" parent="GameUI"]
+[node name="PlayerStrumline" type="Node2D" parent="UI/GameUI"]
 script = ExtResource("2_r3ej1")
 is_player = true
 
-[node name="CPUStrumline" type="Node2D" parent="GameUI"]
+[node name="CPUStrumline" type="Node2D" parent="UI/GameUI"]
 script = ExtResource("2_r3ej1")
 
-[node name="HealthBar" type="ProgressBar" parent="GameUI"]
+[node name="HealthBar" type="ProgressBar" parent="UI/GameUI"]
 clip_contents = true
+layout_mode = 0
 offset_right = 600.0
 offset_bottom = 18.0
 theme_override_styles/background = SubResource("StyleBoxFlat_6os5p")
@@ -67,11 +72,12 @@ value = 50.0
 fill_mode = 1
 show_percentage = false
 
-[node name="BG" type="Sprite2D" parent="GameUI/HealthBar"]
+[node name="BG" type="Sprite2D" parent="UI/GameUI/HealthBar"]
 position = Vector2(300, 9)
 texture = ExtResource("3_qf6w8")
 
-[node name="ScoreTxt" type="Label" parent="GameUI"]
+[node name="ScoreTxt" type="Label" parent="UI/GameUI"]
+layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5

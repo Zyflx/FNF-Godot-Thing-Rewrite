@@ -1,4 +1,4 @@
-class_name GameUI extends CanvasLayer
+class_name GameUI extends Control
 
 @onready var game:Node2D = get_tree().current_scene
 @onready var score_txt:Label = $ScoreTxt
@@ -20,6 +20,10 @@ var rank_map:Dictionary = {
 func _ready() -> void:
 	health_bar.position = Vector2(350, 50)
 	score_txt.position = Vector2(400, 100)
+	pivot_offset = Vector2(
+		(get_viewport_rect().size.x - size.x) * .5,
+		(get_viewport_rect().size.y - size.y) * .5
+	)
 	
 func _process(delta:float) -> void:
 	health = lerpf(health, game.health, delta * 8)

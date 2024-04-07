@@ -6,7 +6,8 @@ const ComboNumber_Node = preload('res://game/objects/ComboNumber.tscn')
 
 # ui
 @onready var cam_game:Camera2D = $CamGame
-@onready var game_ui:GameUI = $GameUI
+@onready var game_ui:GameUI = $UI/GameUI
+var default_zoom:float = .8
 
 # song stuff
 var song_data:Chart
@@ -15,8 +16,8 @@ var song_speed:float = 0.0
 # note stuff
 var note_data:Array[NoteData]
 var cur_note:int = 0
-@onready var plr_strumline:Strumline = $GameUI/PlayerStrumline
-@onready var cpu_strumline:Strumline = $GameUI/CPUStrumline
+@onready var plr_strumline:Strumline = $UI/GameUI/PlayerStrumline
+@onready var cpu_strumline:Strumline = $UI/GameUI/CPUStrumline
 
 # characters
 @onready var bf:Character = $Boyfriend
@@ -73,9 +74,8 @@ func _process(delta:float) -> void:
 		Conductor.stop_music()
 		get_tree().reload_current_scene()
 	
-	cam_game.zoom = Vector2(lerpf(.8, cam_game.zoom.x, exp(-delta * 6)), lerpf(.8, cam_game.zoom.y, exp(-delta * 6)))
+	cam_game.zoom = Vector2(lerpf(default_zoom, cam_game.zoom.x, exp(-delta * 6)), lerpf(default_zoom, cam_game.zoom.y, exp(-delta * 6)))
 	game_ui.scale = Vector2(lerpf(1, game_ui.scale.x, exp(-delta * 6)), lerpf(1, game_ui.scale.y, exp(-delta * 6)))
-	game_ui.offset = Vector2(lerpf(0, game_ui.offset.x, exp(-delta * 6)), lerpf(0, game_ui.offset.y, exp(-delta * 6)))
 	
 	while (note_data != null and note_data.size() != 0 and cur_note != note_data.size() and note_data[cur_note].time - Conductor.time < 1800 / song_speed):
 		if (note_data[cur_note].time - Conductor.time > 1800 / song_speed): break
@@ -127,7 +127,6 @@ func bar_hit(bar:int) -> void:
 	
 	game_ui.scale.x += .03
 	game_ui.scale.y += .03
-	game_ui.offset = Vector2(-20, -10)
 
 	if (song_data.section_data[bar] != null):
 		move_camera(song_data.section_data[bar].mustHitSection)
@@ -218,6 +217,7 @@ func sustain_hit(note:Note) -> void:
 	
 func note_miss(note:Note) -> void:
 	misses += 1
+	combo = 0
 	health -= (.0475 * 50.0)
 	game_ui.update_accuracy(JudgementData.UNDEFINED, true)
 	ScriptHandler.call_scripts('note_miss', [note])
