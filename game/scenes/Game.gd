@@ -244,7 +244,7 @@ func cpu_hit(note:Note) -> void:
 	
 # for player sustains
 func sustain_hit(note:Note) -> void:
-	if (Input.is_action_just_released(actions_arr[note.data.lane]) and note.data.time > note.sustain_kill_threshold - 1):
+	if (Input.is_action_just_released(actions_arr[note.data.lane])):
 		note.is_holding = false
 		note_miss(note)
 		return
