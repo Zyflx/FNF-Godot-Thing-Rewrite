@@ -259,6 +259,7 @@ func note_miss(note:Note) -> void:
 	combo = 0
 	health -= (.0475 * 50.0)
 	game_ui.update_accuracy(JudgementData.UNDEFINED, true)
+	bf.sing(note.data.lane, true)
 	ScriptHandler.call_scripts('note_miss', [note])
 	destroy_note(plr_strumline, note)
 				

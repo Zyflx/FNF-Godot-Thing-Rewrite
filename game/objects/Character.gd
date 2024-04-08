@@ -22,7 +22,7 @@ var danced:bool = false
 func _ready() -> void:
 	init_char(cur_char)
 	centered = false
-	if (not is_player and not is_gf): 
+	if (not is_player and _json.flip_x): 
 		scale.x *= -1
 		# flip left and right
 		sing_anims[0] = 'singRIGHT'
@@ -41,6 +41,8 @@ func init_char(char:String = 'bf') -> void:
 	_json = JSON.parse_string(FileAccess.open(path + '.json', FileAccess.READ).get_as_text())
 	sprite_frames = load(path + '.res')
 	
+	if (_json.no_antialiasing): texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	
 	for i in _json.animations.size():
 		var anim:Dictionary = _json.animations[i]
 		anim_offsets[anim.anim] = [-anim.offsets[0], -anim.offsets[1]]
@@ -48,6 +50,7 @@ func init_char(char:String = 'bf') -> void:
 	has_dance_anims = anim_offsets.has('danceLeft') and anim_offsets.has('danceRight')
 	cam_offset = Vector2(_json.camera_position[0], _json.camera_position[1])
 	pos_offset = Vector2(_json.position[0], _json.position[1])
+	scale = Vector2(_json.scale, _json.scale)
 	
 	dance()
 	
@@ -64,8 +67,8 @@ func play_anim(anim:String, forced:bool = false) -> void:
 	if (forced): frame = 0
 	offset = Vector2(offsets[0], offsets[1])
 	
-func sing(dir:int = 0) -> void:
-	var anim:String = sing_anims[dir % 4]
+func sing(dir:int = 0, missed:bool = false) -> void:
+	var anim:String = sing_anims[dir % 4] if not missed else sing_anims[dir % 4] + 'miss'
 	hold_tmr = 0.0
 	play_anim(anim, true)
 
