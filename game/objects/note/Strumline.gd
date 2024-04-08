@@ -27,9 +27,8 @@ func _process(_delta:float) -> void:
 				
 			if (note.data.is_sustain):
 				if (not note.data.must_hit):
-					if (note.self_modulate.a == 0):
-						if (note.data.time < note.sustain_kill_threshold):
-							game.destroy_note(self, note)
+					if (note.can_kill_sustain):
+						game.destroy_note(self, note)
 				else: if (note.is_holding): game.sustain_hit(note)
 	
 func add_note(note:Note) -> void:

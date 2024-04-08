@@ -12,7 +12,9 @@ var copy_alpha:bool = true
 var is_holding:bool = false:
 	set(v): if (data.must_hit): is_holding = v
 var sustain_kill_threshold:float = 0:
-	get: return (Conductor.time - (data.length * .9)) + 1
+	get: return (Conductor.time - ((data.length * .63) * speed))
+var can_kill_sustain:bool = false:
+	get: return data.length <= 0
 
 var can_hit:bool = false:
 	get: return data.must_hit and data.time >= Conductor.time - (166 * .8) \
@@ -35,6 +37,7 @@ func _ready() -> void:
 		sustain.position.x = (sustain.texture.get_width() * .5) - 50
 		sustain.scale.y = -1
 		sustain.modulate.a = .6
+		sustain.z_index = -1
 		sustain.show_behind_parent = true
 		sustain.material = load('res://game/materials/Sustain Clip.tres')
 		add_child(sustain)
@@ -44,9 +47,15 @@ func _ready() -> void:
 		end.position.y -= sustain.size.y + (end.texture.get_height() * .5)
 		end.scale.y = -1
 		end.modulate.a = .6
+		end.z_index = -1
 		end.show_behind_parent = true
 		end.material = load('res://game/materials/Sustain Clip.tres')
 		add_child(end)
+		
+func _process(delta:float) -> void:
+	if (data.is_sustain):
+		if (is_holding or not data.must_hit and self_modulate.a == 0):
+			data.length -= delta * 1000.0
 		
 func append_data(data:NoteData) -> void:
 	if (data == null): return
