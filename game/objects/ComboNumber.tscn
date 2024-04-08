@@ -1,6 +1,10 @@
-[gd_scene load_steps=2 format=3 uid="uid://bpse1lmihvqy1"]
+[gd_scene load_steps=3 format=3 uid="uid://bpse1lmihvqy1"]
 
+[ext_resource type="Texture2D" uid="uid://bxwqit3pfk2sc" path="res://assets/images/ui/numbers.png" id="1_e1g87"]
 [ext_resource type="Script" path="res://game/objects/ComboNumber.gd" id="1_j83q4"]
 
 [node name="ComboNumber" type="Sprite2D"]
+texture = ExtResource("1_e1g87")
+hframes = 10
+region_rect = Rect2(354, 64, 33, 7)
 script = ExtResource("1_j83q4")

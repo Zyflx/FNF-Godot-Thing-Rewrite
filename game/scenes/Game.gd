@@ -266,7 +266,7 @@ func destroy_note(strumline:Strumline, note:Note) -> void:
 	
 func judge_popup(judgement:int = 1) -> void:
 	var spr:JudgeSprite = JudgeSprite_Node.instantiate()
-	spr.spawn(judgement_data[judgement][0])
+	spr.spawn(judgement)
 	spr.position = Vector2(get_viewport().size.x * .5, get_viewport().size.y * .5)
 	game_ui.add_child(spr)
 	

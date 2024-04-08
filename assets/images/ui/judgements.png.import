@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bsbbsjci3hrhb"
-path="res://.godot/imported/bad.png-acfd2a604492d2bc29cea72f50e07df9.ctex"
+uid="uid://dxcrk4vc50hxe"
+path="res://.godot/imported/judgements.png-a087ad207f52418ce1efac48e34a52bf.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/images/ui/judgements/bad.png"
-dest_files=["res://.godot/imported/bad.png-acfd2a604492d2bc29cea72f50e07df9.ctex"]
+source_file="res://assets/images/ui/judgements.png"
+dest_files=["res://.godot/imported/judgements.png-a087ad207f52418ce1efac48e34a52bf.ctex"]
 
 [params]
 
