@@ -244,14 +244,15 @@ func cpu_hit(note:Note) -> void:
 	
 # for player sustains
 func sustain_hit(note:Note) -> void:
-	plr_strumline.play_anim(note.data.lane, plr_strumline.to_dir(note.data.lane) + ' confirm')
-	bf.sing(note.data.lane)
 	if (Input.is_action_just_released(actions_arr[note.data.lane]) and note.data.time > note.sustain_kill_threshold - 1):
 		note.is_holding = false
 		note_miss(note)
+		return
 	if (note.data.time < note.sustain_kill_threshold):
 		note.is_holding = false
 		destroy_note(plr_strumline, note)
+	plr_strumline.play_anim(note.data.lane, plr_strumline.to_dir(note.data.lane) + ' confirm')
+	bf.sing(note.data.lane)
 	
 func note_miss(note:Note) -> void:
 	misses += 1
