@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://dtcjfpp48li32"]
+
+[ext_resource type="Script" path="res://game/objects/HealthIcon.gd" id="1_34orq"]
+
+[node name="HealthIcon" type="Sprite2D"]
+script = ExtResource("1_34orq")

@@ -114,6 +114,7 @@ func step_hit(step:int) -> void:
 	
 func beat_hit(beat:int) -> void:
 	# print('beat hit %s' % beat)
+	game_ui.icon_bump()
 	if (beat % 2 == 0):
 		if (not bf.animation.contains('sing')): bf.dance()
 		if (not opponent.animation.contains('sing')): opponent.dance()

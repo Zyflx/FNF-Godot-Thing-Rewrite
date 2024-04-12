@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3 uid="uid://ch5s5o7wjrbfj"]
+[gd_scene load_steps=13 format=3 uid="uid://ch5s5o7wjrbfj"]
 
 [ext_resource type="Script" path="res://game/scenes/Game.gd" id="1_lhvvv"]
 [ext_resource type="Script" path="res://game/ui/GameUI.gd" id="2_idyur"]
@@ -6,6 +6,7 @@
 [ext_resource type="Script" path="res://game/objects/Character.gd" id="2_ubb1j"]
 [ext_resource type="Texture2D" uid="uid://drhsyp4knqt3m" path="res://assets/images/ui/healthBar.png" id="3_qf6w8"]
 [ext_resource type="FontFile" uid="uid://b6neu3gwqpjma" path="res://assets/fonts/vcr.ttf" id="3_rkdvy"]
+[ext_resource type="Script" path="res://game/objects/HealthIcon.gd" id="6_rnrv4"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_0dpec"]
 
@@ -75,6 +76,13 @@ show_percentage = false
 [node name="BG" type="Sprite2D" parent="UI/GameUI/HealthBar"]
 position = Vector2(300, 9)
 texture = ExtResource("3_qf6w8")
+
+[node name="CPUIcon" type="Sprite2D" parent="UI/GameUI"]
+script = ExtResource("6_rnrv4")
+
+[node name="PlayerIcon" type="Sprite2D" parent="UI/GameUI"]
+script = ExtResource("6_rnrv4")
+is_player = true
 
 [node name="ScoreTxt" type="Label" parent="UI/GameUI"]
 layout_mode = 1
