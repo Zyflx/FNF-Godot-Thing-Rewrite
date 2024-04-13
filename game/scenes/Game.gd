@@ -38,7 +38,8 @@ var actions_arr:Array[String] = ['note_left', 'note_down', 'note_up', 'note_righ
 var score:int = 0
 var misses:int = 0
 var combo:int = 0
-var health:float = 50.0
+var health:float = 50.0:
+	set(v): health = clampf(v, 0, 100.0)
 
 static var instance:Game
 
