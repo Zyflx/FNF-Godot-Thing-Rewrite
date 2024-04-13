@@ -15,8 +15,8 @@ var sustain_kill_threshold:float = 0:
 	get: return (Conductor.time - data.length) - 20
 
 var can_hit:bool = false:
-	get: return data.must_hit and data.time >= Conductor.time - (Timings.worst_judge * .8) \
-	and data.time <= Conductor.time + (Timings.worst_judge * 1)
+	get: return data.must_hit and data.time >= Conductor.time - (Timings.worst_judge[1] * .8) \
+	and data.time <= Conductor.time + (Timings.worst_judge[1] * 1)
 var can_cause_miss:bool = false:
 	get: return not is_holding and data.must_hit and position.y > get_viewport().size.y + 20
 var was_good_hit:bool = false:
