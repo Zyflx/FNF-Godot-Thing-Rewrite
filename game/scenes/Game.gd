@@ -31,17 +31,6 @@ var cur_note:int = 0
 @onready var opponent:Character = $Opponent
 @onready var spectator:Character = $Spectator
 
-# judgement stuff
-enum JudgementData {UNDEFINED = 0, TIER1 = 1, TIER2 = 2, TIER3 = 3, TIER4 = 4}
-var judgement_data:Dictionary = {
-	# format: judgement name, timing window, accuracy modifier, score, health gain
-	JudgementData.TIER4: ['sick', 45, 1, 350, .03],
-	JudgementData.TIER3: ['good', 90, .75, 200, .023],
-	JudgementData.TIER2: ['bad', 135, .4, 100, .015],
-	JudgementData.TIER1: ['shit', 166, .15, 50, .01],
-	JudgementData.UNDEFINED: ['undefined', 0, 0, 0, 0]
-}
-
 # controls
 var actions_arr:Array[String] = ['note_left', 'note_down', 'note_up', 'note_right']
 
@@ -51,7 +40,13 @@ var misses:int = 0
 var combo:int = 0
 var health:float = 50.0
 
+static var instance:Game
+
 func _ready() -> void:
+	instance = self
+	
+	Timings.reset()
+	
 	song_data = Chart.chart
 
 	Conductor.bpm = song_data.info.bpm
@@ -217,15 +212,17 @@ func player_hit(note:Note) -> void:
 	
 	bf.sing(note.data.lane)
 	
-	var judgement:int = get_judgement(absf(note.data.time - Conductor.time))
+	var judgement:int = Timings.get_judgement(absf(note.data.time - Conductor.time))
+	var judge_name:String = Timings.judgement_data[judgement][0]
 	
-	if (judgement == JudgementData.TIER4): plr_strumline.spawn_splash(note)
+	if (judge_name == 'sick' or judge_name == 'swag'):
+		plr_strumline.spawn_splash(note)
 	
 	combo += 1
-	health += judgement_data[judgement][4] * 50.0
-	score += judgement_data[judgement][3]
+	health += Timings.judgement_data[judgement][4] * 50.0
+	score += Timings.judgement_data[judgement][3]
 	
-	game_ui.update_accuracy(judgement)
+	Timings.update_accuracy(judgement)
 	
 	judge_popup(judgement)
 	
@@ -259,7 +256,7 @@ func note_miss(note:Note) -> void:
 	misses += 1
 	combo = 0
 	health -= (.0475 * 50.0)
-	game_ui.update_accuracy(JudgementData.UNDEFINED, true)
+	Timings.update_accuracy(Timings.JudgementData.UNDEFINED, true)
 	bf.sing(note.data.lane, true)
 	ScriptHandler.call_scripts('note_miss', [note])
 	destroy_note(plr_strumline, note)
@@ -297,9 +294,3 @@ func judge_popup(judgement:int = 1) -> void:
 		ntwn.finished.connect(num.queue_free)
 		
 		loop += 1
-	
-func get_judgement(diff:float = -1) -> JudgementData:
-	for i in judgement_data.keys():
-		if (diff <= judgement_data[i][1]):
-			return i
-	return JudgementData.UNDEFINED

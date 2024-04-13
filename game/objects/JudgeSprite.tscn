@@ -1,9 +1,9 @@
 [gd_scene load_steps=3 format=3 uid="uid://cj5jehwead84g"]
 
-[ext_resource type="Texture2D" uid="uid://dxcrk4vc50hxe" path="res://assets/images/ui/judgements.png" id="1_r1cqg"]
 [ext_resource type="Script" path="res://game/objects/JudgeSprite.gd" id="1_ta0uw"]
+[ext_resource type="Texture2D" uid="uid://bc07b7iye2x8o" path="res://assets/images/ui/judgements.png" id="1_v6ln7"]
 
 [node name="JudgeSprite" type="Sprite2D"]
-texture = ExtResource("1_r1cqg")
-vframes = 4
+texture = ExtResource("1_v6ln7")
+vframes = 5
 script = ExtResource("1_ta0uw")
