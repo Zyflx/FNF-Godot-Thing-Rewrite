@@ -21,6 +21,8 @@ static var rank_map:Dictionary = {
 	70: 'E'
 }
 
+static var worst_judge:int = judgement_data[JudgementData.TIER1][1]
+
 static var accuracy:float = 0.0
 static var total:float = 0.0
 static var played:int = 0

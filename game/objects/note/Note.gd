@@ -15,8 +15,8 @@ var sustain_kill_threshold:float = 0:
 	get: return (Conductor.time - data.length) - 20
 
 var can_hit:bool = false:
-	get: return data.must_hit and data.time >= Conductor.time - (166 * .8) \
-	and data.time <= Conductor.time + (166 * 1)
+	get: return data.must_hit and data.time >= Conductor.time - (Timings.worst_judge * .8) \
+	and data.time <= Conductor.time + (Timings.worst_judge * 1)
 var can_cause_miss:bool = false:
 	get: return not is_holding and data.must_hit and position.y > get_viewport().size.y + 20
 var was_good_hit:bool = false:
@@ -35,7 +35,7 @@ func _ready() -> void:
 		sustain.position.x = (sustain.texture.get_width() * .5) - 50
 		sustain.scale.y = -1
 		sustain.modulate.a = .6
-		# sustain.z_index = -1
+		sustain.z_index = -1
 		sustain.show_behind_parent = true
 		sustain.material = load('res://game/materials/Sustain Clip.tres')
 		add_child(sustain)
@@ -45,7 +45,7 @@ func _ready() -> void:
 		end.position.y -= sustain.size.y + (end.texture.get_height() * .5)
 		end.scale.y = -1
 		end.modulate.a = .6
-		# end.z_index = -1
+		end.z_index = -1
 		end.show_behind_parent = true
 		end.material = load('res://game/materials/Sustain Clip.tres')
 		add_child(end)
